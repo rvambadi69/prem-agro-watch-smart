@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Sprout, Droplets, BarChart3, User } from "lucide-react";
+import { Home, Sprout, Droplets, BarChart3, User, IndianRupee } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
@@ -12,6 +12,7 @@ const navigation = [
   { name: "Farms", href: "/farms", icon: Sprout },
   { name: "Irrigation", href: "/irrigation", icon: Droplets },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Crop Prices", href: "/crop-prices", icon: IndianRupee },
   { name: "Profile", href: "/profile", icon: User }
 ];
 

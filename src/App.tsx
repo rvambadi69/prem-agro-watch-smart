@@ -9,6 +9,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import Farms from "./pages/Farms";
 import Irrigation from "./pages/Irrigation";
 import Analytics from "./pages/Analytics";
+import CropPrices from "./pages/CropPrices";
 import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/farms" element={<DashboardLayout><Farms /></DashboardLayout>} />
           <Route path="/irrigation" element={<DashboardLayout><Irrigation /></DashboardLayout>} />
           <Route path="/analytics" element={<DashboardLayout><Analytics /></DashboardLayout>} />
+          <Route path="/crop-prices" element={<DashboardLayout><CropPrices /></DashboardLayout>} />
           <Route path="/profile" element={<DashboardLayout><Profile /></DashboardLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
