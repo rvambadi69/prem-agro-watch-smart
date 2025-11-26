@@ -1,6 +1,7 @@
 Agriculture module
 
-This module is a small Spring Boot application inside the repo that provides demo API endpoints for the frontend to use.
+This module is a small Spring Boot application inside the repo that provides demo API endpoints for the 
+frontend to use.
 
 Endpoints
 - GET /api/health — returns { status: "UP", application: "Agriculture" }
