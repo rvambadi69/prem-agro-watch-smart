@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: agrosmart
+      POSTGRES_PASSWORD: agrosmartpass
+      POSTGRES_DB: agrosmartdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U agrosmart -d agrosmartdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/agrosmartdb
+      SPRING_DATASOURCE_USERNAME: agrosmart
+      SPRING_DATASOURCE_PASSWORD: agrosmartpass
+    depends_on:
+      - db
+
+volumes:
+  db_data:
