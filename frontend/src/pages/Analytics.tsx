@@ -1,29 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
-import { mockFarms, generateSensorData, calculateYieldPrediction } from "@/lib/mockData";
+import { generateSensorData, calculateYieldPrediction } from "@/lib/mockData";
+import React from "react";
+import { fetchFarms } from "@/lib/api";
 
 export default function Analytics() {
-  const sensorData = generateSensorData(1);
-  
-  const moistureByFarm = mockFarms.map(farm => {
+  const [farms, setFarms] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const sensorData = React.useMemo(() => generateSensorData(1), []);
+
+  React.useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    fetchFarms()
+      .then((data) => { if (mounted) setFarms(data); })
+      .catch(() => {})
+      .finally(() => mounted && setLoading(false));
+    return () => { mounted = false; };
+  }, []);
+
+  const moistureByFarm = farms.map((farm) => {
     const data = generateSensorData(farm.id);
     const avgMoisture = data.reduce((acc, d) => acc + d.soilMoisture, 0) / data.length;
-    return {
-      name: farm.name,
-      moisture: Math.round(avgMoisture)
-    };
+    return { name: farm.name, moisture: Math.round(avgMoisture) };
   });
 
-  const yieldPredictions = mockFarms.map(farm => {
+  const yieldPredictions = farms.map((farm) => {
     const data = generateSensorData(farm.id);
     const avgTemp = data.reduce((acc, d) => acc + d.temperature, 0) / data.length;
     const avgMoisture = data.reduce((acc, d) => acc + d.soilMoisture, 0) / data.length;
-    return {
-      farm: farm.name,
-      crop: farm.cropType,
-      predicted: calculateYieldPrediction(farm.cropType, avgTemp, avgMoisture)
-    };
+    return { farm: farm.name, crop: farm.cropType, predicted: calculateYieldPrediction(farm.cropType, avgTemp, avgMoisture) };
   });
 
   return (
