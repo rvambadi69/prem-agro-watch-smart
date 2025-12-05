@@ -20,15 +20,25 @@ export type Farmer = {
   location: string;
 };
 
+export type CropPrice = {
+  id: number;
+  name: string;
+  price: number;
+  unit: string;
+  updatedAt: string;
+};
+
 // Read API base URL and API key from Vite env vars with sensible fallbacks
 const VITE_API = (import.meta.env.VITE_API_URL as string) || "http://localhost:8080";
 const API_BASE_URL = `${VITE_API.replace(/\/+$/,'')}/api`;
 const API_KEY = (import.meta.env.VITE_API_KEY as string) || undefined;
+const ADMIN_HEADER = "x-admin-key";
 
-function defaultHeaders(json = true) {
+function defaultHeaders(json = true, adminKey?: string) {
   const headers: Record<string,string> = {};
   if (json) headers['Content-Type'] = 'application/json';
   if (API_KEY) headers['x-api-key'] = API_KEY;
+  if (adminKey) headers[ADMIN_HEADER] = adminKey;
   return headers;
 }
 
@@ -94,4 +104,33 @@ export async function updateFarmer(id: number, payload: Partial<Farmer>): Promis
   });
   if (!res.ok) throw new Error("Failed to update farmer");
   return res.json();
+}
+
+// GET crop prices
+export async function fetchCropPrices(): Promise<CropPrice[]> {
+  const res = await fetch(`${API_BASE_URL}/crop-prices`, { headers: defaultHeaders(false) });
+  if (!res.ok) throw new Error("Failed to load crop prices");
+  return res.json();
+}
+
+// POST create or update a crop price (admin key required)
+export async function upsertCropPrice(payload: Partial<CropPrice> & { name: string; price: number; unit: string }, adminKey: string): Promise<CropPrice> {
+  const res = await fetch(`${API_BASE_URL}/crop-prices`, {
+    method: "POST",
+    headers: defaultHeaders(true, adminKey),
+    body: JSON.stringify(payload),
+  });
+  if (res.status === 403) throw new Error("Invalid admin key");
+  if (!res.ok) throw new Error("Failed to save crop price");
+  return res.json();
+}
+
+// Validate admin key before enabling admin mode
+export async function validateAdminKey(adminKey: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/crop-prices/validate`, {
+    method: "GET",
+    headers: defaultHeaders(false, adminKey),
+  });
+  if (res.status === 403) throw new Error("Invalid admin key");
+  if (!res.ok) throw new Error("Unable to validate admin key");
 }
